@@ -4,6 +4,12 @@ variable "vpc_cidr_block" {
   default     = "192.168.8.0/24"
 }
 
+variable "project_name" {
+  description = "Name of the project for resource naming"
+  type        = string
+  default     = "cloud-homelab"
+}
+
 variable "private_subnet_cidr" {
   description = "CIDR block of the private subnet (not accessible from the Internet)."
   type        = string

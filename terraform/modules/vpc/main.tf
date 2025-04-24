@@ -3,16 +3,28 @@
 #################################################################
 resource "aws_vpc" "cloud_homelab" {
   cidr_block = var.vpc_cidr_block
+  
+  tags = {
+    Name = "${var.project_name}-vpc"
+  }
 }
 
 resource "aws_subnet" "cloud_homelab_private" {
   vpc_id     = aws_vpc.cloud_homelab.id
   cidr_block = var.private_subnet_cidr
+
+  tags = {
+    Name = "${var.project_name}-private-subnet"
+  }
 }
 
 resource "aws_subnet" "cloud_homelab_public" {
   vpc_id     = aws_vpc.cloud_homelab.id
   cidr_block = var.public_subnet_cidr
+
+  tags = {
+    Name = "${var.project_name}-public-subnet"
+  }
 }
 
 
