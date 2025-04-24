@@ -1,0 +1,65 @@
+# OpenTofu / Terraform related
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+terraform/crash.log
+terraform/crash.*.log
+terraform/.terraformrc
+terraform/terraform.rc
+terraform/terraform.tfvars
+terraform/.terraform.d/
+.terraform/
+
+# Ansible related
+ansible/inventory/hosts.ini
+ansible/*.retry
+ansible/.vault_pass
+ansible/collections/
+ansible/.ansible/
+*.retry
+
+# SSH Keys
+*.pem
+*.key
+id_rsa*
+id_dsa*
+known_hosts
+
+# Kubernetes related
+.kube/
+kubeconfig
+/tmp/kubeadm_join_cmd.sh
+
+# Flux related
+.flux.yaml
+flux-system/
+flux.yaml
+
+# Personal environment files
+.env
+.envrc
+*.env.local
+
+# Editor directories and files
+.vscode/
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+/tmp/
+*.tmp
+*.bak
+*.swp
+*.save
+
+# Secrets and credentials
+credentials.json
+*_token
+*_key
+*.jwk
+*.crt
+*.ca
+/secrets/
