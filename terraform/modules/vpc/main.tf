@@ -3,7 +3,7 @@
 #################################################################
 resource "aws_vpc" "cloud_homelab" {
   cidr_block = var.vpc_cidr_block
-  
+
   tags = {
     Name = "${var.project_name}-vpc"
   }
@@ -31,6 +31,55 @@ resource "aws_subnet" "cloud_homelab_public" {
 #################################################################
 # Routing tables
 #################################################################
+resource "aws_route_table" "cloud_homelab_public" {
+  vpc_id = aws_vpc.cloud_homelab.id
+
+  # route traffic to the VPC CIDR block (e.g. 192.168.8.0/24) locally
+  route {
+    cidr_block = aws_vpc.cloud_homelab.cidr_block
+    gateway_id = "local"
+  }
+
+  # route traffic to the Internet to Internet Gateway
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.cloud_homelab.id
+  }
+
+  tags = {
+    Name = "${var.project_name}-public-rtb"
+  }
+}
+
+resource "aws_route_table" "cloud_homelab_private" {
+  vpc_id = aws_vpc.cloud_homelab.id
+
+  # route traffic to the VPC CIDR block (e.g. 192.168.8.0/24) locally
+  route {
+    cidr_block = aws_vpc.cloud_homelab.cidr_block
+    gateway_id = "local"
+  }
+
+  # route traffic to the Internet to NAT Gateway
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.cloud_homelab.id
+  }
+
+  tags = {
+    Name = "${var.project_name}-private-rtb"
+  }
+}
+
+resource "aws_route_table_association" "cloud_homelab_public" {
+  subnet_id      = aws_subnet.cloud_homelab_public.id
+  route_table_id = aws_route_table.cloud_homelab_public.id
+}
+
+resource "aws_route_table_association" "cloud_homelab_private" {
+  subnet_id      = aws_subnet.cloud_homelab_private.id
+  route_table_id = aws_route_table.cloud_homelab_private.id
+}
 
 #################################################################
 # ACL and associations
@@ -39,6 +88,32 @@ resource "aws_subnet" "cloud_homelab_public" {
 #################################################################
 # Internet connectivity (NAT and Internet Gateway)
 #################################################################
+# Elastic IP address
+resource "aws_eip" "cloud_homelab" {
+  domain = "vpc"
+}
+
+resource "aws_internet_gateway" "cloud_homelab" {
+  vpc_id = aws_vpc.cloud_homelab.id
+
+  tags = {
+    Name = "${var.project_name}-igw"
+  }
+}
+
+# A public NAT gateway to enable instances in private subnet to have internet access
+resource "aws_nat_gateway" "cloud_homelab" {
+  allocation_id = aws_eip.cloud_homelab.id
+  subnet_id     = aws_subnet.cloud_homelab_private.id
+
+  tags = {
+    Name = "${var.project_name}-natgw"
+  }
+
+  # To ensure proper ordering, it is recommended to add an explicit dependency
+  # on the Internet Gateway for the VPC.
+  depends_on = [aws_internet_gateway.cloud_homelab]
+}
 
 #################################################################
 # Security group rules
