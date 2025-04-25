@@ -10,13 +10,14 @@ provider "aws" {
 }
 
 module "instances" {
-  source       = "./modules/instances"
-  vpc_id       = module.vpc.vpc_id
-  project_name = var.project_name
+  source                      = "./modules/instances"
+  ec2_ami                     = var.ec2_ami
+  vpc_id                      = module.vpc.vpc_id
+  project_name                = var.project_name
+  subnet_id                   = module.vpc.private_subnet_id
+  ssh_key_name                = var.ssh_key_name
+  admin_jumpbox_instance_type = var.admin_jumpbox_instance_type
   /*
-  subnet_id             = var.subnet_id
-  ssh_key_name          = var.ssh_key_name
-  admin_instance_type   = var.admin_instance_type
   control_instance_type = var.control_instance_type
   worker_instance_type  = var.worker_instance_type
   worker_count          = var.worker_count
@@ -24,8 +25,8 @@ module "instances" {
 }
 
 module "vpc" {
-  source = "./modules/vpc"
-
+  source                          = "./modules/vpc"
+  project_name                    = var.project_name
   vpc_cidr_block                  = "192.168.8.0/24"
   private_subnet_cidr             = "192.168.8.0/27"
   public_subnet_cidr              = "192.168.8.128/27"

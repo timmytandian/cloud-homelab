@@ -7,25 +7,28 @@ resource "aws_security_group" "kubernetes_instances" {
 
 }
 
-/*
+data "aws_key_pair" "cloud_homelab" {
+  key_name = var.ssh_key_name
+}
+
 # Admin/Control instance
-resource "aws_instance" "admin" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.admin_instance_type
+resource "aws_instance" "admin_jumpbox" {
+  ami                    = var.ec2_ami
+  instance_type          = var.admin_jumpbox_instance_type
   key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.homelab_sg.id]
+  vpc_security_group_ids = [aws_security_group.kubernetes_instances.id]
   subnet_id              = var.subnet_id
 
   root_block_device {
-    volume_size = 20
+    volume_size = 8
   }
 
   tags = {
-    Name = "${var.project_name}-admin"
-    Role = "admin"
+    Name = "${var.project_name}-admin-jumpbox"
   }
 }
 
+/*
 # Kubernetes control plane
 resource "aws_instance" "control" {
   ami                    = data.aws_ami.ubuntu.id
@@ -60,22 +63,6 @@ resource "aws_instance" "workers" {
   tags = {
     Name = "${var.project_name}-worker-${count.index + 1}"
     Role = "k8s-worker"
-  }
-}
-
-# Get latest Ubuntu AMI
-data "aws_ami" "ubuntu" {
-  most_recent = true
-  owners      = ["099720109477"] # Canonical
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
   }
 }
 */
