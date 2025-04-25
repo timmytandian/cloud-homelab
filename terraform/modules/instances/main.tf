@@ -28,6 +28,23 @@ resource "aws_instance" "admin_jumpbox" {
   }
 }
 
+resource "aws_eip" "admin_jumpbox" {
+  network_interface = aws_network_interface.admin_jumpbox.id
+  domain            = "vpc"
+}
+
+resource "aws_network_interface" "admin_jumpbox" {
+  subnet_id       = var.subnet_id
+  security_groups = [aws_security_group.kubernetes_instances.id]
+  attachment {
+    instance     = aws_instance.admin_jumpbox.id
+    device_index = 1
+  }
+  tags = {
+    Name = "primary_network_interface"
+  }
+}
+
 /*
 # Kubernetes control plane
 resource "aws_instance" "control" {
