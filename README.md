@@ -21,18 +21,19 @@ This project creates a cloud-based homelab environment using AWS, OpenTofu, Ansi
 
 ### 1. Infrastructure Provisioning
 
-1. Navigate to the terraform directory:
+1. Make sure we are already authorized to call AWS API. One way to do so is to use AWS Profile (assuming it has been configured correctly):
+   ```shell
+   export AWS_PROFILE=terraform
+   aws s3 ls
    ```
+
+2. Navigate to the terraform directory:
+   ```shell
    cd terraform
    ```
 
-2. Copy the example variables file and edit it:
-   ```
-   cp terraform.tfvars.example terraform.tfvars
-   ```
-
 3. Initialize and apply the Terraform configuration:
-   ```
+   ```shell
    tofu init
    tofu apply
    ```
