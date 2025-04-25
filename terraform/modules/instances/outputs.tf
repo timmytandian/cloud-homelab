@@ -1,6 +1,11 @@
 output "k8s_instances_security_group_id" {
   value       = aws_security_group.kubernetes_instances.id
-  description = "The security group ID of the Kubernetes instances"
+  description = "The security group ID of the Kubernetes instances."
+}
+
+output "jumpbox_instances_security_group_id" {
+  value       = aws_security_group.admin_jumpbox.id
+  description = "The security group ID of the administrative jumpbox instance."
 }
 
 output "admin_jumpbox_private_ip" {

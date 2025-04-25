@@ -32,3 +32,8 @@ variable "k8s_instances_security_group_id" {
   description = "The security group ID of the Kubernetes instances"
   type        = string
 }
+
+variable "jumpbox_instances_security_group_id" {
+  description = "The security group ID of the administrative jumpbox instance"
+  type        = string
+}

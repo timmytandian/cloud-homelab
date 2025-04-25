@@ -25,13 +25,14 @@ module "instances" {
 }
 
 module "vpc" {
-  source                          = "./modules/vpc"
-  project_name                    = var.project_name
-  vpc_cidr_block                  = "192.168.8.0/24"
-  private_subnet_cidr             = "192.168.8.0/27"
-  public_subnet_cidr              = "192.168.8.128/27"
-  allow_icmp                      = true
-  k8s_instances_security_group_id = module.instances.k8s_instances_security_group_id
+  source                              = "./modules/vpc"
+  project_name                        = var.project_name
+  vpc_cidr_block                      = "192.168.8.0/24"
+  private_subnet_cidr                 = "192.168.8.0/27"
+  public_subnet_cidr                  = "192.168.8.128/27"
+  allow_icmp                          = true
+  k8s_instances_security_group_id     = module.instances.k8s_instances_security_group_id
+  jumpbox_instances_security_group_id = module.instances.jumpbox_instances_security_group_id
 }
 
 /*

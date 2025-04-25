@@ -4,7 +4,12 @@ resource "aws_security_group" "kubernetes_instances" {
   name        = "${var.project_name}-k8s-sg"
   description = "Security group for the Kubernetes nodes in my cloud-homelab."
   vpc_id      = var.vpc_id
+}
 
+resource "aws_security_group" "admin_jumpbox" {
+  name        = "${var.project_name}-jumpbox-sg"
+  description = "Security group for the administrative jumpbox in my cloud-homelab."
+  vpc_id      = var.vpc_id
 }
 
 data "aws_key_pair" "cloud_homelab" {
@@ -16,7 +21,7 @@ resource "aws_instance" "admin_jumpbox" {
   ami                         = var.ec2_ami
   instance_type               = var.admin_jumpbox_instance_type
   key_name                    = var.ssh_key_name
-  vpc_security_group_ids      = [aws_security_group.kubernetes_instances.id]
+  vpc_security_group_ids      = [aws_security_group.admin_jumpbox.id]
   subnet_id                   = var.subnet_id
   associate_public_ip_address = true
   root_block_device {
