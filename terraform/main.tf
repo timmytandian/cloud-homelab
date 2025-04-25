@@ -14,7 +14,7 @@ module "instances" {
   ec2_ami                     = var.ec2_ami
   vpc_id                      = module.vpc.vpc_id
   project_name                = var.project_name
-  subnet_id                   = module.vpc.private_subnet_id
+  subnet_id                   = module.vpc.public_subnet_id
   ssh_key_name                = var.ssh_key_name
   admin_jumpbox_instance_type = var.admin_jumpbox_instance_type
   /*
