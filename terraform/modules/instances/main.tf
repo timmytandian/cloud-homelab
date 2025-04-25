@@ -28,6 +28,14 @@ resource "aws_instance" "admin_jumpbox" {
     volume_size = 8
   }
 
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      instance_interruption_behavior = "stop"
+      spot_instance_type             = "persistent"
+    }
+  }
+
   tags = {
     Name = "${var.project_name}-admin-jumpbox"
   }
