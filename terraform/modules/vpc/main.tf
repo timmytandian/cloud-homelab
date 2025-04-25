@@ -62,8 +62,8 @@ resource "aws_route_table" "cloud_homelab_private" {
 
   # route traffic to the Internet to NAT Gateway
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.cloud_homelab.id
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.cloud_homelab.id
   }
 
   tags = {
@@ -167,6 +167,22 @@ resource "aws_vpc_security_group_ingress_rule" "allow_icmp" {
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   security_group_id = var.k8s_instances_security_group_id
+  description       = "Allow all outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "jumpbox_allow_ssh" {
+  security_group_id = var.jumpbox_instances_security_group_id
+  description       = "Allow all inbound SSH"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+}
+
+resource "aws_vpc_security_group_egress_rule" "jumpbox_allow_all_outbound" {
+  security_group_id = var.jumpbox_instances_security_group_id
   description       = "Allow all outbound traffic"
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
