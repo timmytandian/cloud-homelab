@@ -13,12 +13,12 @@ data "aws_key_pair" "cloud_homelab" {
 
 # Admin/Control instance
 resource "aws_instance" "admin_jumpbox" {
-  ami                    = var.ec2_ami
-  instance_type          = var.admin_jumpbox_instance_type
-  key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.kubernetes_instances.id]
-  subnet_id              = var.subnet_id
-
+  ami                         = var.ec2_ami
+  instance_type               = var.admin_jumpbox_instance_type
+  key_name                    = var.ssh_key_name
+  vpc_security_group_ids      = [aws_security_group.kubernetes_instances.id]
+  subnet_id                   = var.subnet_id
+  associate_public_ip_address = true
   root_block_device {
     volume_size = 8
   }
@@ -29,21 +29,29 @@ resource "aws_instance" "admin_jumpbox" {
 }
 
 resource "aws_eip" "admin_jumpbox" {
-  network_interface = aws_network_interface.admin_jumpbox.id
-  domain            = "vpc"
+  #network_interface = aws_network_interface.admin_jumpbox.id
+  instance = aws_instance.admin_jumpbox.id
+  domain   = "vpc"
 }
 
+data "aws_network_interface" "admin_jumpbox" {
+  id = aws_instance.admin_jumpbox.primary_network_interface_id
+}
+
+/*
 resource "aws_network_interface" "admin_jumpbox" {
   subnet_id       = var.subnet_id
+  description     = "Interface for admin jumpbox instance"
   security_groups = [aws_security_group.kubernetes_instances.id]
   attachment {
     instance     = aws_instance.admin_jumpbox.id
     device_index = 1
   }
   tags = {
-    Name = "primary_network_interface"
+    Name = "admin_jumpbox"
   }
 }
+*/
 
 /*
 # Kubernetes control plane
