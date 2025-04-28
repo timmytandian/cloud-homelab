@@ -37,6 +37,9 @@ if [ "$SUCCESS" = true ]; then
   # Connect your machine to your Tailscale network using pre-auth-key
   AUTH_KEY=$(aws ssm get-parameter --name "/ec2/tailscale-auth-key" --with-decryption --query Parameter.Value --output text)
   sudo tailscale up --auth-key=$AUTH_KEY
+
+  # Release the environment variable containing Tailscale auth key (for security reason)
+  unset AUTH_KEY
 else
   echo "Failed to establish connection after $MAX_ATTEMPTS attempts"
   exit 1
