@@ -25,7 +25,7 @@ variable "public_subnet_cidr" {
 variable "subnet_az" {
   description = "The availability zone ID of the VPC subnet (single AZ)"
   type        = string
-  default     = "apne1-az4"
+  default     = "apne1-az2"
 }
 
 variable "allow_icmp" {
