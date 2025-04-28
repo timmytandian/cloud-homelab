@@ -22,6 +22,12 @@ variable "public_subnet_cidr" {
   default     = "192.168.8.128/27"
 }
 
+variable "subnet_az" {
+  description = "The availability zone ID of the VPC subnet (single AZ)"
+  type        = string
+  default     = "apne1-az4"
+}
+
 variable "allow_icmp" {
   description = "Set to true to allow ICMP ping."
   type        = bool

@@ -5,6 +5,12 @@ variable "aws_region" {
 }
 
 # VPC
+variable "subnet_az" {
+  description = "The availability zone ID of the VPC subnet (single AZ)"
+  type        = string
+  default     = "apne1-az4"
+}
+
 variable "vpc_cidr_block" {
   description = "CIDR block of the cloud-homelab VPC."
   type        = string

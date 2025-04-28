@@ -10,8 +10,9 @@ resource "aws_vpc" "cloud_homelab" {
 }
 
 resource "aws_subnet" "cloud_homelab_private" {
-  vpc_id     = aws_vpc.cloud_homelab.id
-  cidr_block = var.private_subnet_cidr
+  vpc_id               = aws_vpc.cloud_homelab.id
+  cidr_block           = var.private_subnet_cidr
+  availability_zone_id = var.subnet_az
 
   tags = {
     Name = "${var.project_name}-private-subnet"
@@ -19,8 +20,9 @@ resource "aws_subnet" "cloud_homelab_private" {
 }
 
 resource "aws_subnet" "cloud_homelab_public" {
-  vpc_id     = aws_vpc.cloud_homelab.id
-  cidr_block = var.public_subnet_cidr
+  vpc_id               = aws_vpc.cloud_homelab.id
+  cidr_block           = var.public_subnet_cidr
+  availability_zone_id = var.subnet_az
 
   tags = {
     Name = "${var.project_name}-public-subnet"
@@ -40,7 +42,7 @@ resource "aws_route_table" "cloud_homelab_public" {
     gateway_id = "local"
   }
 
-  # route traffic to the Internet to Internet Gateway
+  # route traffic to the Internet via Internet Gateway
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.cloud_homelab.id
