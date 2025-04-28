@@ -27,3 +27,8 @@ output "worker_node_private_ip" {
   value       = data.aws_network_interface.worker.private_ip
   description = "Private IPv4 address of the network interface of the Kubernetes workers node."
 }
+
+output "tailscale_auth_key_ssm_name" {
+  value       = aws_ssm_parameter.tailscale_auth_key.name
+  description = "The name of SSM parameter store holding the Tailscale authentication key (secure string)"
+}

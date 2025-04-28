@@ -20,6 +20,76 @@ data "aws_key_pair" "cloud_homelab" {
 }
 
 #################################################################
+# SSM Parameter store (to store Tailscale auth key) and related IAM permissions
+#################################################################
+resource "aws_ssm_parameter" "tailscale_auth_key" {
+  name        = "/ec2/tailscale-auth-key"
+  description = "The authentication key to join Tailnet"
+  type        = "SecureString"
+  value       = var.tailscale_auth_key
+}
+
+# IAM role for EC2 instance
+resource "aws_iam_role" "tailscale_auth_key" {
+  name = "ec2-access-ssm-parameter-store"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# IAM policy document to allow access to the specific SSM parameter
+data "aws_iam_policy_document" "tailscale_auth_key" {
+  statement {
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParametersByPath"
+    ]
+    resources = [
+      aws_ssm_parameter.tailscale_auth_key.arn
+    ]
+    effect = "Allow"
+  }
+
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = ["*"] # More restrictive KMS key ARN should be used in production
+    effect    = "Allow"
+  }
+}
+
+# IAM policy for SSM parameter access
+resource "aws_iam_policy" "tailscale_auth_key" {
+  name        = "access-ssm-parameter-store-tailscale-auth-key"
+  description = "Policy to allow EC2 access to SSM parameters storing Tailscale auth key"
+  policy      = data.aws_iam_policy_document.tailscale_auth_key.json
+}
+
+# Attach the policy to the role
+resource "aws_iam_role_policy_attachment" "tailscale_auth_key" {
+  role       = aws_iam_role.tailscale_auth_key.name
+  policy_arn = aws_iam_policy.tailscale_auth_key.arn
+}
+
+# Create EC2 instance profile
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "ec2-access-ssm-parameter-store"
+  role = aws_iam_role.tailscale_auth_key.name
+}
+
+#################################################################
 # Administrative jumpbox instance
 #################################################################
 resource "aws_instance" "admin_jumpbox" {

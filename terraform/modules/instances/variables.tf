@@ -59,3 +59,9 @@ variable "nat_gateway_id" {
   description = "The ID of NAT Gateway to enable outboud internet access for hosts in private subnet."
   type        = string
 }
+
+variable "tailscale_auth_key" {
+  description = "The authentication key to join Tailnet."
+  type        = string
+  sensitive   = true
+}

@@ -73,22 +73,8 @@ variable "worker_node_instance_type" {
   default     = "t3a.micro"
 }
 
-/*
-variable "control_instance_type" {
-  description = "Instance type for the Kubernetes control plane"
+variable "tailscale_auth_key" {
+  description = "The authentication key to join Tailnet."
   type        = string
-  default     = "t3.medium"
+  sensitive   = true
 }
-
-variable "worker_instance_type" {
-  description = "Instance type for the Kubernetes worker nodes"
-  type        = string
-  default     = "t3.large"
-}
-
-variable "worker_count" {
-  description = "Number of worker nodes to deploy"
-  type        = number
-  default     = 2
-}
-*/

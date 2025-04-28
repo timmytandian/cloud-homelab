@@ -35,7 +35,8 @@ if [ "$SUCCESS" = true ]; then
   sudo apt-get update && sudo apt-get install -y tailscale
 
   # Connect your machine to your Tailscale network using pre-auth-key
-  sudo tailscale up --auth-key=tskey-auth-kBUrRBa7xS11CNTRL-DwTJzUNNHVAs5NiPpbwPUAegJek3kNsc
+  AUTH_KEY=$(aws ssm get-parameter --name "/ec2/tailscale-auth-key" --with-decryption --query Parameter.Value --output text)
+  sudo tailscale up --auth-key=$AUTH_KEY
 else
   echo "Failed to establish connection after $MAX_ATTEMPTS attempts"
   exit 1

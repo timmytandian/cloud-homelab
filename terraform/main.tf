@@ -25,6 +25,7 @@ module "instances" {
   # admin jumpbox
   is_admin_jumpbox_subnet_public = false
   admin_jumpbox_instance_type    = var.admin_jumpbox_instance_type
+  tailscale_auth_key             = var.tailscale_auth_key
 
   # Kubernetes control plane
   control_plane_instance_type = var.control_plane_instance_type

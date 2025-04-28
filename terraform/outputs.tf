@@ -27,3 +27,8 @@ output "subnet_az" {
   value       = module.vpc.subnet_az
   description = "The availability zone where our workload is placed (single AZ)."
 }
+
+output "tailscale_auth_key_ssm_name" {
+  value       = module.instances.tailscale_auth_key_ssm_name
+  description = "The name of SSM parameter store holding the Tailscale authentication key (secure string)"
+}
