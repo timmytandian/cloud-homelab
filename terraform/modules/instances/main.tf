@@ -102,6 +102,7 @@ resource "aws_instance" "admin_jumpbox" {
   root_block_device {
     volume_size = 8
   }
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
   user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
     nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
@@ -147,6 +148,7 @@ resource "aws_instance" "control" {
   }
 
   /*
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
   user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
     nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
   })

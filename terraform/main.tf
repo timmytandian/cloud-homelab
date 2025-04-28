@@ -16,14 +16,14 @@ module "instances" {
   project_name = var.project_name
 
   # networking
-  vpc_id                  = module.vpc.vpc_id
-  admin_jumpbox_subnet_id = module.vpc.public_subnet_id
-  cluster_subnet_id       = module.vpc.private_subnet_id
-  nat_gateway_id          = module.vpc.nat_gateway_id
-  ssh_key_name            = var.ssh_key_name
+  vpc_id            = module.vpc.vpc_id
+  cluster_subnet_id = module.vpc.private_subnet_id
+  nat_gateway_id    = module.vpc.nat_gateway_id
+  ssh_key_name      = var.ssh_key_name
 
   # admin jumpbox
   is_admin_jumpbox_subnet_public = false
+  admin_jumpbox_subnet_id        = module.vpc.private_subnet_id
   admin_jumpbox_instance_type    = var.admin_jumpbox_instance_type
   tailscale_auth_key             = var.tailscale_auth_key
 
