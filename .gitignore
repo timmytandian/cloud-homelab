@@ -7,7 +7,7 @@ terraform/crash.log
 terraform/crash.*.log
 terraform/.terraformrc
 terraform/terraform.rc
-terraform/terraform.tfvars
+terraform/secret.tfvars
 terraform/.terraform.d/
 .terraform/
 
