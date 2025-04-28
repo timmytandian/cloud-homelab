@@ -20,7 +20,7 @@ output "control_plane_private_ip" {
 
 output "worker_node_private_ip" {
   value       = module.instances.worker_node_private_ip
-  description = "Private IPv4 address of the network interface of the Kubernetes workers node."
+  description = "Private IPv4 addresses of the network interfaces of the Kubernetes worker nodes."
 }
 
 output "subnet_az" {

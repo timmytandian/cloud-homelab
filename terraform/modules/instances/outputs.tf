@@ -24,8 +24,8 @@ output "control_plane_private_ip" {
 }
 
 output "worker_node_private_ip" {
-  value       = data.aws_network_interface.worker.private_ip
-  description = "Private IPv4 address of the network interface of the Kubernetes workers node."
+  value       = [for interface in data.aws_network_interface.worker : interface.private_ip]
+  description = "Private IPv4 addresses of the network interfaces of the Kubernetes workers nodes."
 }
 
 output "tailscale_auth_key_ssm_name" {

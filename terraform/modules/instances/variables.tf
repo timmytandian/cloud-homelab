@@ -65,3 +65,9 @@ variable "tailscale_auth_key" {
   type        = string
   sensitive   = true
 }
+
+variable "worker_node_count" {
+  description = "The number of worker nodes to provision."
+  type        = number
+  default     = 1
+}

@@ -175,6 +175,7 @@ data "aws_network_interface" "control" {
 # Kubernetes worker node instance
 #################################################################
 resource "aws_instance" "worker" {
+  count                       = var.worker_node_count
   ami                         = var.ec2_ami
   instance_type               = var.worker_node_instance_type
   key_name                    = var.ssh_key_name
@@ -205,5 +206,6 @@ resource "aws_instance" "worker" {
 }
 
 data "aws_network_interface" "worker" {
-  id = aws_instance.worker.primary_network_interface_id
+  count = var.worker_node_count
+  id    = aws_instance.worker[count.index].primary_network_interface_id
 }

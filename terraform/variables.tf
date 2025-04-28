@@ -73,6 +73,12 @@ variable "worker_node_instance_type" {
   default     = "t3a.micro"
 }
 
+variable "worker_node_count" {
+  description = "The number of worker nodes to provision."
+  type        = number
+  default     = 1
+}
+
 variable "tailscale_auth_key" {
   description = "The authentication key to join Tailnet."
   type        = string

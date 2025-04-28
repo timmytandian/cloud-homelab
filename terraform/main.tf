@@ -32,6 +32,7 @@ module "instances" {
 
   # Kubernetes workers node
   worker_node_instance_type = var.worker_node_instance_type
+  worker_node_count         = 2
 }
 
 module "vpc" {
