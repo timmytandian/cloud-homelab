@@ -106,7 +106,7 @@ resource "aws_internet_gateway" "cloud_homelab" {
 # A public NAT gateway to enable instances in private subnet to have internet access
 resource "aws_nat_gateway" "cloud_homelab" {
   allocation_id = aws_eip.cloud_homelab.id
-  subnet_id     = aws_subnet.cloud_homelab_private.id
+  subnet_id     = aws_subnet.cloud_homelab_public.id # NAT gateway has to be placed in public subnet
 
   tags = {
     Name = "${var.project_name}-natgw"
