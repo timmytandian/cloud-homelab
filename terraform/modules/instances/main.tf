@@ -1,4 +1,3 @@
-
 # Security group for all instances
 resource "aws_security_group" "kubernetes_instances" {
   name        = "${var.project_name}-k8s-sg"
@@ -27,6 +26,8 @@ resource "aws_instance" "admin_jumpbox" {
   root_block_device {
     volume_size = 8
   }
+
+  user_data = file("${path.root}/scripts/install-tailscale.sh")
 
   instance_market_options {
     market_type = "spot"
