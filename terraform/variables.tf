@@ -8,7 +8,7 @@ variable "aws_region" {
 variable "subnet_az" {
   description = "The availability zone ID of the VPC subnet (single AZ)"
   type        = string
-  default     = "apne1-az4"
+  default     = "apne1-az2"
 }
 
 variable "vpc_cidr_block" {
@@ -57,6 +57,18 @@ variable "ssh_key_name" {
 
 variable "admin_jumpbox_instance_type" {
   description = "Instance type for the admin jumpbox host. Default to t3a.micro (AMD-based x86 CPU)."
+  type        = string
+  default     = "t3a.micro"
+}
+
+variable "control_plane_instance_type" {
+  description = "Instance type for the control plane node. Default to t3a.micro (AMD-based x86 CPU)."
+  type        = string
+  default     = "t3a.micro"
+}
+
+variable "worker_node_instance_type" {
+  description = "Instance type for the worker node. Default to t3a.micro (AMD-based x86 CPU)."
   type        = string
   default     = "t3a.micro"
 }

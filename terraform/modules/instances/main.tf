@@ -1,3 +1,6 @@
+#################################################################
+# Security groups and SSH
+#################################################################
 # Security group for all instances
 resource "aws_security_group" "kubernetes_instances" {
   name        = "${var.project_name}-k8s-sg"
@@ -11,23 +14,28 @@ resource "aws_security_group" "admin_jumpbox" {
   vpc_id      = var.vpc_id
 }
 
+# SSH keypair
 data "aws_key_pair" "cloud_homelab" {
   key_name = var.ssh_key_name
 }
 
-# Admin/Control instance
+#################################################################
+# Administrative jumpbox instance
+#################################################################
 resource "aws_instance" "admin_jumpbox" {
   ami                         = var.ec2_ami
   instance_type               = var.admin_jumpbox_instance_type
   key_name                    = var.ssh_key_name
   vpc_security_group_ids      = [aws_security_group.admin_jumpbox.id]
-  subnet_id                   = var.subnet_id
-  associate_public_ip_address = true
+  subnet_id                   = var.admin_jumpbox_subnet_id
+  associate_public_ip_address = var.is_admin_jumpbox_subnet_public ? true : false
   root_block_device {
     volume_size = 8
   }
 
-  user_data = file("${path.root}/scripts/install-tailscale.sh")
+  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
+    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
+  })
 
   instance_market_options {
     market_type = "spot"
@@ -43,7 +51,9 @@ resource "aws_instance" "admin_jumpbox" {
 }
 
 resource "aws_eip" "admin_jumpbox" {
-  #network_interface = aws_network_interface.admin_jumpbox.id
+  # create elastic IP only if the jumpbox machine is placed in public subnet
+  count = var.is_admin_jumpbox_subnet_public ? 1 : 0
+
   instance = aws_instance.admin_jumpbox.id
   domain   = "vpc"
 }
@@ -52,56 +62,76 @@ data "aws_network_interface" "admin_jumpbox" {
   id = aws_instance.admin_jumpbox.primary_network_interface_id
 }
 
-/*
-resource "aws_network_interface" "admin_jumpbox" {
-  subnet_id       = var.subnet_id
-  description     = "Interface for admin jumpbox instance"
-  security_groups = [aws_security_group.kubernetes_instances.id]
-  attachment {
-    instance     = aws_instance.admin_jumpbox.id
-    device_index = 1
-  }
-  tags = {
-    Name = "admin_jumpbox"
-  }
-}
-*/
-
-/*
-# Kubernetes control plane
+#################################################################
+# Kubernetes control plane instance
+#################################################################
 resource "aws_instance" "control" {
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.control_instance_type
-  key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.homelab_sg.id]
-  subnet_id              = var.subnet_id
-
+  ami                         = var.ec2_ami
+  instance_type               = var.control_plane_instance_type
+  key_name                    = var.ssh_key_name
+  vpc_security_group_ids      = [aws_security_group.kubernetes_instances.id]
+  subnet_id                   = var.cluster_subnet_id
+  associate_public_ip_address = false
   root_block_device {
-    volume_size = 50
+    volume_size = 8
+  }
+
+  /*
+  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
+    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
+  })
+  */
+
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      instance_interruption_behavior = "stop"
+      spot_instance_type             = "persistent"
+    }
   }
 
   tags = {
-    Name = "${var.project_name}-control"
-    Role = "k8s-control"
+    Name = "${var.project_name}-control-plane"
   }
 }
 
-# Kubernetes worker nodes
-resource "aws_instance" "workers" {
-  count                  = var.worker_count
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = var.worker_instance_type
-  key_name               = var.ssh_key_name
-  vpc_security_group_ids = [aws_security_group.homelab_sg.id]
-  subnet_id              = var.subnet_id
+data "aws_network_interface" "control" {
+  id = aws_instance.control.primary_network_interface_id
+}
 
+#################################################################
+# Kubernetes worker node instance
+#################################################################
+resource "aws_instance" "worker" {
+  ami                         = var.ec2_ami
+  instance_type               = var.worker_node_instance_type
+  key_name                    = var.ssh_key_name
+  vpc_security_group_ids      = [aws_security_group.kubernetes_instances.id]
+  subnet_id                   = var.cluster_subnet_id
+  associate_public_ip_address = false
   root_block_device {
-    volume_size = 100
+    volume_size = 8
+  }
+
+  /*
+  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
+    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
+  })
+  */
+
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      instance_interruption_behavior = "stop"
+      spot_instance_type             = "persistent"
+    }
   }
 
   tags = {
-    Name = "${var.project_name}-worker-${count.index + 1}"
-    Role = "k8s-worker"
+    Name = "${var.project_name}-worker"
   }
 }
-*/
+
+data "aws_network_interface" "worker" {
+  id = aws_instance.control.primary_network_interface_id
+}
