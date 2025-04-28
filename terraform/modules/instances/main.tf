@@ -104,8 +104,10 @@ resource "aws_instance" "admin_jumpbox" {
   }
   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 
-  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
-    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
+  user_data = templatefile("${path.root}/templates/multipart-userdata.tftpl", {
+    hostname         = "${var.project_name}-admin-jumpbox"
+    tailscale_script = file("${path.root}/scripts/install-tailscale.sh")
+    nat_gateway_id   = var.nat_gateway_id
   })
 
   instance_market_options {
@@ -147,12 +149,11 @@ resource "aws_instance" "control" {
     volume_size = 8
   }
 
-  /*
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
-  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
-    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
-  })
-  */
+  user_data = <<EOF
+    #cloud-config
+    preserve_hostname: false
+    hostname: ${var.project_name}-control-plane
+    EOF
 
   instance_market_options {
     market_type = "spot"
@@ -186,11 +187,11 @@ resource "aws_instance" "worker" {
     volume_size = 8
   }
 
-  /*
-  user_data = templatefile("${path.root}/scripts/install-tailscale.sh", {
-    nat_gateway_id = var.nat_gateway_id # the NAT Gateway ID is required to make sure it is created before this instance
-  })
-  */
+  user_data = <<EOF
+    #cloud-config
+    preserve_hostname: false
+    hostname: ${var.project_name}-worker-${count.index}
+    EOF
 
   instance_market_options {
     market_type = "spot"
@@ -201,7 +202,7 @@ resource "aws_instance" "worker" {
   }
 
   tags = {
-    Name = "${var.project_name}-worker"
+    Name = "${var.project_name}-worker-${count.index}"
   }
 }
 
