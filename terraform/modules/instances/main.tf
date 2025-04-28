@@ -205,5 +205,5 @@ resource "aws_instance" "worker" {
 }
 
 data "aws_network_interface" "worker" {
-  id = aws_instance.control.primary_network_interface_id
+  id = aws_instance.worker.primary_network_interface_id
 }
